@@ -1,0 +1,19 @@
+name: Test
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Setup smoke
+        run: |
+          curl https://github.com/SamirTalwar/smoke/releases/download/v2.3.2/smoke-v2.3.2-Linux-x86_64 \
+            -L -o smoke
+          chmod a+x smoke
+      - name: Run tests
+        run: ./smoke .

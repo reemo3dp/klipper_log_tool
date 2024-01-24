@@ -92,6 +92,7 @@ echo "$OUTPUT"
 
 if [[ $UPLOAD -eq 1 ]]; then
     if [[ $YES -ne 1 ]]; then
+        # shellcheck disable=SC2140
         echo "This data will be uploaded to $HASTEBIN_URL for easier sharing. It will be unprotected and publicly available. Type "okay" to continue."
         read -r ANSWER
         if [[ $ANSWER != "okay" ]]; then

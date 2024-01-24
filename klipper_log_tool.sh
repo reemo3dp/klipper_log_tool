@@ -58,6 +58,8 @@ if [[ $# -eq 0 ]]; then
         echo >&2 "No file specified and default file $FILE does not exist."
         usage
     fi
+else
+    FILE="$1"
 fi
 
 set -u
@@ -85,7 +87,7 @@ process_klipper_log() {
         remove_noise
 }
 
-OUTPUT=$(process_klipper_log "$1")
+OUTPUT=$(process_klipper_log "$FILE")
 echo "$OUTPUT"
 
 if [[ $UPLOAD -eq 1 ]]; then

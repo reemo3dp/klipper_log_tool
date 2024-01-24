@@ -103,3 +103,4 @@ if [[ $UPLOAD -eq 1 ]]; then
     KEY=$(echo "$RESPONSE" | awk -F '"' '{print $4}')
     echo "Pasted to ${HASTEBIN_URL%documents}$KEY"
 fi
+

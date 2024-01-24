@@ -37,6 +37,31 @@ tests:
         echo Hi
     stdout:
       - contains: 'Start printer at Sat May  6 16:29:38 2023 (1683390578.7 4387047.6)\nLogline1\nLogline2\nLogline3'
+  - name: Works without start marker
+    args:
+      - test/nostartmarker.txt
+    stdout: |
+      
+      webhooks client 139646904459424: Disconnected
+      Restarting printer
+      ===== Config file =====
+      webhooks client 139646904459424: Disconnected
+      Restarting printer
+      ===== Config file =====
+      webhooks client 139646904459424: Disconnected
+      Restarting printer
+      ===== Config file =====
+      [virtual_sdcard]
+      path = /opt/printer_data/gcodes
+
+      [pause_resume]
+
+      [display_status]
+
+      [exclude_object]
+
+      [mcu]
+      serial =
   - name: Raw returns everything
     args:
       - test/raw.txt

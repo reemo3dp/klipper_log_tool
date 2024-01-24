@@ -1,3 +1,4 @@
+Start printer at Sat May  6 16:29:38 2023 (1683390578.7 4387047.6)
 Logline1
 Logline2
 Logline3

@@ -1,3 +1,4 @@
+Start printer at Sat May  6 16:29:38 2023 (1683390578.7 4387047.6)
 Empty otherwise
 Sent 63 160.867442 160.867442 59: seq: 16, i2c_write oid=0 data=b'@\x0e\x00\x07\x0f\t\t\t\r\x05\x00\x06\x0f\t\t\x07\x0f', i2c_write oid=0 data=b'\x00\xb7\x11\x08', i2c_write oid=0 data=b"@\x08\x00\x07\x0f\x08\x08\x07\x0f\x08\x00#'$$4\x1f", i2c_write oid=0 data=b'\x00\xb7\x12\x08'
 Sent 64 160.867680 160.867680 48: seq: 17, i2c_write oid=0 data=b'@\x0f\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00', i2c_write oid=0 data=b'\x00\xb7\x15\x02', i2c_write oid=0 data=b'@\x00\x00\x00\x00', i2c_write oid=0 data=b'\x00\xb7\x15\x06'

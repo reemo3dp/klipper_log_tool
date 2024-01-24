@@ -7,6 +7,7 @@ tests:
     args:
       - test/only_last_log.txt
     stdout: |
+      Start printer at Sat May  6 16:29:38 2023 (1683390578.7 4387047.6)
       ===== Config file =====
       [virtual_sdcard]
       path = /opt/printer_data/gcodes
@@ -23,6 +24,7 @@ tests:
     args:
       - test/remove_noise.txt
     stdout: |
+      Start printer at Sat May  6 16:29:38 2023 (1683390578.7 4387047.6)
       Empty otherwise
       Dumping serial stats: bytes_write=5424 bytes_read=4673 bytes_retransmit=9 bytes_invalid=0 send_seq=219 receive_seq=219 retransmit_seq=2 srtt=0.001 rttvar=0.001 rto=0.025 ready_bytes=0 upcoming_bytes=0
   - name: Should upload to a service
@@ -34,7 +36,7 @@ tests:
         ./klipper_log_tool.sh test/uploads_to_service.txt -u -y
         echo Hi
     stdout:
-      - contains: 'Logline1\nLogline2\nLogline3'
+      - contains: 'Start printer at Sat May  6 16:29:38 2023 (1683390578.7 4387047.6)\nLogline1\nLogline2\nLogline3'
   - name: Raw returns everything
     args:
       - test/raw.txt

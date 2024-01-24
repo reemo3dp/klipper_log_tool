@@ -70,7 +70,7 @@ remove_noise() {
 
 only_last() {
     FILE="$1"
-    sed -ne '/Start printer at/,$p' < "$FILE"
+    sed -n 'H; /^Start printer at/h; ${g;p;}' "$FILE"
 }
 
 process_klipper_log() {

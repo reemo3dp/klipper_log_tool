@@ -91,17 +91,17 @@ OUTPUT=$(process_klipper_log "$FILE")
 echo "$OUTPUT"
 
 if [[ $UPLOAD -eq 1 ]]; then
+    echo ""
+    echo "----------------------------------------"
+    echo ""
     if [[ $YES -ne 1 ]]; then
         # shellcheck disable=SC2140
-        echo "This data will be uploaded to $HASTEBIN_URL for easier sharing. It will be unprotected and publicly available. Type "okay" to continue."
-        read -r ANSWER
-        if [[ $ANSWER != "okay" ]]; then
-            echo "Aborting."
-            exit 1
-        fi
+        echo "This data will be uploaded to $HASTEBIN_URL for easier sharing. It will be unprotected and publicly available. Press ENTER to continue, Ctrl+C to abort."
+        read -r
     fi
     RESPONSE=$(echo "$OUTPUT" | curl -sfXPOST -T- "$HASTEBIN_URL")
     KEY=$(echo "$RESPONSE" | awk -F '"' '{print $4}')
-    echo "Pasted to ${HASTEBIN_URL%documents}$KEY"
+    echo ""
+    echo "Share the following url: ${HASTEBIN_URL%documents}$KEY"
 fi
 

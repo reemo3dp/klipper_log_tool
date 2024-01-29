@@ -28,20 +28,18 @@ tests:
       Empty otherwise
       Dumping serial stats: bytes_write=5424 bytes_read=4673 bytes_retransmit=9 bytes_invalid=0 send_seq=219 receive_seq=219 retransmit_seq=2 srtt=0.001 rttvar=0.001 rto=0.025 ready_bytes=0 upcoming_bytes=0
   - name: Should upload to a service
-    command:
-      shell:
-        - bash
-      script: |
-        export HASTEBIN_URL=https://httpbin.org/post
-        ./klipper_log_tool.sh test/uploads_to_service.txt -u -y
-        echo Hi
+    args:
+      - test/uploads_to_service.txt
+      - -u
+      - -y
     stdout:
       - contains: 'Start printer at Sat May  6 16:29:38 2023 (1683390578.7 4387047.6)\nLogline1\nLogline2\nLogline3'
+      - contains: 'Share the following url: https://paste.armbian.com/'
   - name: Works without start marker
     args:
       - test/nostartmarker.txt
     stdout: |
-      
+
       webhooks client 139646904459424: Disconnected
       Restarting printer
       ===== Config file =====
@@ -83,13 +81,13 @@ tests:
       ===== Config file =====
       [virtual_sdcard]
       path = /opt/printer_data/gcodes
-      
+
       [pause_resume]
-      
+
       [display_status]
-      
+
       [exclude_object]
-      
+
       [mcu]
       serial =
   - name: All Starts returns starts but no noise
@@ -111,12 +109,12 @@ tests:
       ===== Config file =====
       [virtual_sdcard]
       path = /opt/printer_data/gcodes
-      
+
       [pause_resume]
-      
+
       [display_status]
-      
+
       [exclude_object]
-      
+
       [mcu]
       serial =

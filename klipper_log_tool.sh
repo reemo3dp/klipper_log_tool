@@ -4,19 +4,44 @@ set -eo pipefail
 
 HASTEBIN_URL=${HASTEBIN_URL:-https://paste.armbian.com/documents}
 
+remove_noise() {
+    grep -vE '^(Stats |Sent |Receive:|Dumping receive queue)'
+}
+
+only_last() {
+    FILE="$1"
+    # shellcheck disable=SC2016
+    sed -n 'H; /^Start printer at/h; ${g;p;}' "$FILE"
+}
+
+process_klipper_log() {
+    FILE="$1"
+    if [[ $RAW -eq 1 ]]; then
+        cat "$FILE"
+        return
+    fi
+    if [[ $ALL_STARTS -eq 1 ]]; then
+        remove_noise <"$FILE"
+        return
+    fi
+    only_last "$FILE" |
+        remove_noise
+}
+
 usage() {
     cat >&2 <<EOF
-Usage: $0 [ -u | --upload ] [ -y | --yes ] [ -r | --raw ] [ -a | --all-starts ] [KLIPPER_LOG_FILE]
+Usage: $0 [ -f | --find ] [ -u | --upload ] [ -y | --yes ] [ -r | --raw ] [ -a | --all-starts ] [KLIPPER_LOG_FILE]...
 EOF
     exit 1
 }
 
+FIND=0
 UPLOAD=0
 YES=0
 RAW=0
 ALL_STARTS=0
 
-args=$(getopt -a -o hyura --long help,yes,upload,raw,all-starts -- "$@")
+args=$(getopt -a -o fhyura --long find,help,yes,upload,raw,all-starts -- "$@")
 # shellcheck disable=SC2181
 if [[ $? -gt 0 ]]; then
     usage
@@ -24,6 +49,10 @@ fi
 eval set -- "${args}"
 while :; do
     case $1 in
+    -f | --find)
+        FIND=1
+        shift
+        ;;
     -u | --upload)
         UPLOAD=1
         shift
@@ -52,42 +81,41 @@ while :; do
     esac
 done
 
-if [[ $# -eq 0 ]]; then
-    FILE="$HOME/printer_data/logs/klippy.log"
-    if [[ ! -f $FILE ]]; then
-        echo >&2 "No file specified and default file $FILE does not exist."
-        usage
+# shellcheck disable=SC2206
+FILES=($@)
+
+# If empty, check if default exists and replace that with FILES
+if [[ ${#FILES[@]} -eq 0 ]]; then
+    if [[ $FIND -eq 1 ]]; then
+        FILES=($(find /home -type f -name klippy.log 2>/dev/null))
+        if [[ ${#FILES[@]} -eq 0 ]]; then
+            echo >&2 "No klippy.log files found."
+            exit 1
+        fi
+    else
+        FILE="$HOME/printer_data/logs/klippy.log"
+        if [[ ! -f $FILE ]]; then
+            echo >&2 "No file specified and default file $FILE does not exist."
+            usage
+        fi
+        FILES=("$FILE")
     fi
-else
-    FILE="$1"
 fi
 
 set -u
 
-remove_noise() {
-    grep -vE '^(Stats |Sent |Receive:|Dumping receive queue)'
-}
+# Collect output from processing each file into OUTPUT
+OUTPUT=""
+for FILE in "${FILES[@]}"; do
+    set +e
+    OUTPUT="${OUTPUT}Logfile: $FILE
+--------------------------------------------
+"
+    OUTPUT="${OUTPUT}$(process_klipper_log "$FILE")
+"
+    set -e
+done
 
-only_last() {
-    FILE="$1"
-    sed -n 'H; /^Start printer at/h; ${g;p;}' "$FILE"
-}
-
-process_klipper_log() {
-    FILE="$1"
-    if [[ $RAW -eq 1 ]]; then
-        cat "$FILE"
-        return
-    fi
-    if [[ $ALL_STARTS -eq 1 ]]; then
-        remove_noise <"$FILE"
-        return
-    fi
-    only_last "$FILE" |
-        remove_noise
-}
-
-OUTPUT=$(process_klipper_log "$FILE")
 echo "$OUTPUT"
 
 if [[ $UPLOAD -eq 1 ]]; then
@@ -104,4 +132,3 @@ if [[ $UPLOAD -eq 1 ]]; then
     echo ""
     echo "Share the following url: ${HASTEBIN_URL%documents}$KEY"
 fi
-

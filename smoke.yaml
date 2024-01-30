@@ -6,7 +6,9 @@ tests:
   - name: Considers only the last start
     args:
       - test/only_last_log.txt
-    stdout: |
+    stdout: |+
+      Logfile: test/only_last_log.txt
+      --------------------------------------------
       Start printer at Sat May  6 16:29:38 2023 (1683390578.7 4387047.6)
       ===== Config file =====
       [virtual_sdcard]
@@ -20,13 +22,17 @@ tests:
 
       [mcu]
       serial =
+
   - name: Remove stats, received, sent and dumping messages
     args:
       - test/remove_noise.txt
-    stdout: |
+    stdout: |+
+      Logfile: test/remove_noise.txt
+      --------------------------------------------
       Start printer at Sat May  6 16:29:38 2023 (1683390578.7 4387047.6)
       Empty otherwise
       Dumping serial stats: bytes_write=5424 bytes_read=4673 bytes_retransmit=9 bytes_invalid=0 send_seq=219 receive_seq=219 retransmit_seq=2 srtt=0.001 rttvar=0.001 rto=0.025 ready_bytes=0 upcoming_bytes=0
+      
   - name: Should upload to a service
     args:
       - test/uploads_to_service.txt
@@ -38,7 +44,9 @@ tests:
   - name: Works without start marker
     args:
       - test/nostartmarker.txt
-    stdout: |
+    stdout: |+
+      Logfile: test/nostartmarker.txt
+      --------------------------------------------
 
       webhooks client 139646904459424: Disconnected
       Restarting printer
@@ -60,11 +68,14 @@ tests:
 
       [mcu]
       serial =
+
   - name: Raw returns everything
     args:
       - test/raw.txt
       - --raw
-    stdout: |
+    stdout: |+
+      Logfile: test/raw.txt
+      --------------------------------------------
       webhooks client 139646904459424: Disconnected
       Restarting printer
       Start printer at Sat May  6 16:29:38 2023 (1683390578.7 4387047.6)
@@ -90,11 +101,14 @@ tests:
 
       [mcu]
       serial =
+
   - name: All Starts returns starts but no noise
     args:
       - test/raw.txt
       - --all-starts
-    stdout: |
+    stdout: |+
+      Logfile: test/raw.txt
+      --------------------------------------------
       webhooks client 139646904459424: Disconnected
       Restarting printer
       Start printer at Sat May  6 16:29:38 2023 (1683390578.7 4387047.6)
@@ -118,3 +132,39 @@ tests:
 
       [mcu]
       serial =
+
+  - name: Default looks for $HOME/printer_data/logs/klippy.log
+    command:
+      shell:
+        - bash
+      script: |
+        docker run --rm -v $PWD:/mnt alpine:latest sh -c 'apk add bash 2&>1 > /dev/null && 
+          mkdir -p /root/printer_data/logs && 
+          touch /root/printer_data/logs/klippy.log &&
+          bash /mnt/klipper_log_tool.sh'
+    stdout: |+
+      Logfile: /root/printer_data/logs/klippy.log
+      --------------------------------------------
+
+      
+  - name: Find looks aggressively for all klipper logs
+    command:
+      shell:
+        - bash
+      script: |
+        docker run --rm -v $PWD:/mnt alpine:latest sh -c 'apk add bash 2&>1 > /dev/null && 
+          mkdir -p /home/woop/printer_data/logs && 
+          mkdir -p /home/woop/klipper/logs && 
+          mkdir -p /root/ && 
+          touch /home/woop/printer_data/logs/klippy.log && 
+          touch /home/woop/klipper/logs/klippy.log && 
+          touch /root/klippy.log &&
+          bash /mnt/klipper_log_tool.sh --find'
+    stdout: |+
+      Logfile: /home/woop/printer_data/logs/klippy.log
+      --------------------------------------------
+      
+      Logfile: /home/woop/klipper/logs/klippy.log
+      --------------------------------------------
+
+

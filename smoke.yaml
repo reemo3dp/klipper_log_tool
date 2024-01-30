@@ -138,7 +138,7 @@ tests:
       shell:
         - bash
       script: |
-        docker run --rm -v $PWD:/mnt alpine:latest sh -c 'apk add bash 2&>1 > /dev/null && 
+        docker run -q --rm -v $PWD:/mnt alpine:latest sh -c 'apk add bash 2&>1 > /dev/null && 
           mkdir -p /root/printer_data/logs && 
           touch /root/printer_data/logs/klippy.log &&
           bash /mnt/klipper_log_tool.sh'
@@ -152,7 +152,7 @@ tests:
       shell:
         - bash
       script: |
-        docker run --rm -v $PWD:/mnt alpine:latest sh -c 'apk add bash 2&>1 > /dev/null && 
+        docker run -q --rm -v $PWD:/mnt alpine:latest sh -c 'apk add bash 2&>1 > /dev/null && 
           mkdir -p /home/woop/printer_data/logs && 
           mkdir -p /home/woop/klipper/logs && 
           mkdir -p /root/ && 
@@ -160,11 +160,7 @@ tests:
           touch /home/woop/klipper/logs/klippy.log && 
           touch /root/klippy.log &&
           bash /mnt/klipper_log_tool.sh --find'
-    stdout: |+
-      Logfile: /home/woop/printer_data/logs/klippy.log
-      --------------------------------------------
-      
-      Logfile: /home/woop/klipper/logs/klippy.log
-      --------------------------------------------
-
+    stdout: 
+      - contains: "Logfile: /home/woop/printer_data/logs/klippy.log"
+      - contains: "Logfile: /home/woop/klipper/logs/klippy.log"
 

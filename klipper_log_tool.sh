@@ -87,7 +87,9 @@ FILES=($@)
 # If empty, check if default exists and replace that with FILES
 if [[ ${#FILES[@]} -eq 0 ]]; then
     if [[ $FIND -eq 1 ]]; then
+        set +e
         FILES=($(find /home -type f -name klippy.log 2>/dev/null))
+        set -e
         if [[ ${#FILES[@]} -eq 0 ]]; then
             echo >&2 "No klippy.log files found."
             exit 1

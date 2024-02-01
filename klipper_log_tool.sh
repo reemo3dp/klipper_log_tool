@@ -107,18 +107,20 @@ fi
 set -u
 
 # Collect output from processing each file into OUTPUT
-OUTPUT=""
+TARGET_OUTPUT_FILE=$(mktemp)
+touch "$TARGET_OUTPUT_FILE"
+trap 'rm "$TARGET_OUTPUT_FILE"' EXIT
+
 for FILE in "${FILES[@]}"; do
     set +e
-    OUTPUT="${OUTPUT}Logfile: $FILE
---------------------------------------------
-"
-    OUTPUT="${OUTPUT}$(process_klipper_log "$FILE")
-"
+    echo "Logfile: $FILE
+--------------------------------------------" >>"$TARGET_OUTPUT_FILE"
+    process_klipper_log "$FILE" >>"$TARGET_OUTPUT_FILE"
+    echo "" >>"$TARGET_OUTPUT_FILE"
     set -e
 done
 
-echo "$OUTPUT"
+cat "$TARGET_OUTPUT_FILE"
 
 if [[ $UPLOAD -eq 1 ]]; then
     echo ""
@@ -129,7 +131,7 @@ if [[ $UPLOAD -eq 1 ]]; then
         echo "This data will be uploaded to $HASTEBIN_URL for easier sharing. It will be unprotected and publicly available. Press ENTER to continue, Ctrl+C to abort."
         read -r
     fi
-    RESPONSE=$(echo "$OUTPUT" | curl -sfXPOST -T- "$HASTEBIN_URL")
+    RESPONSE=$(cat "$TARGET_OUTPUT_FILE" | curl -sfXPOST -T- "$HASTEBIN_URL")
     KEY=$(echo "$RESPONSE" | awk -F '"' '{print $4}')
     echo ""
     echo "Share the following url: ${HASTEBIN_URL%documents}$KEY"

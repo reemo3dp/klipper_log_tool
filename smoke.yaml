@@ -101,7 +101,6 @@ tests:
 
       [mcu]
       serial =
-
   - name: All Starts returns starts but no noise
     args:
       - test/raw.txt
@@ -145,7 +144,6 @@ tests:
     stdout: |+
       Logfile: /root/printer_data/logs/klippy.log
       --------------------------------------------
-
       
   - name: Find looks aggressively for all klipper logs
     command:
